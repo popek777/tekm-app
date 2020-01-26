@@ -34,11 +34,3 @@ endif()
 include_directories("${CMAKE_SOURCE_DIR}/thirdparty/json/include")
 include_directories("${CMAKE_SOURCE_DIR}/thirdparty/fifo_map/src")
 
-##target_link_libraries(tekm-app tooska)
-#add_library(tooska SHARED IMPORTED)
-#set_target_properties(tooska PROPERTIES
-  #IMPORTED_LOCATION "${CMAKE_SOURCE_DIR}/thirdparty/tooska/lib/src/libtooska.so"
-  #INTERFACE_INCLUDE_DIRECTORIES "${CMAKE_SOURCE_DIR}/thirdparty/tooska/src"
-#)
-#target_link_libraries(tekm-app tooska)
-

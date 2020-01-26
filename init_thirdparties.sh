@@ -12,14 +12,5 @@ fi
 tar -xvf boost_1_66_0.tar.gz
 rm boost_1_66_0.tar.gz
 
-git clone https://github.com/HamedMasafi/tooska.git
-cd tooska
-mkdir lib 
-cmake -Blib -H.
-cd lib 
-make -j 12
-
-cd ../../
-
 git clone https://github.com/nlohmann/json.git
 git clone https://github.com/nlohmann/fifo_map.git
