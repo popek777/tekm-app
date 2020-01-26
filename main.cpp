@@ -1,9 +1,18 @@
 #include <iostream>
 #include <string>
 
-int main() {
+#include "AppUtils.h"
+#include "HttpsUtils.h"
 
-  std::cout << "hi there!" << std::endl;
+int main() {
+  auto timeContent = https::get("time.com", "443", "/");
+  //removeUnrecognizedXmlPatterns(timeContent);
+  auto briefItems = cutBriefItems(timeContent);
+
+  std::cout << serializeToJsonString(briefItems) << std::endl;
+
+  //std::cout << timeContent << std::endl;
+  //std::cout << getBriefsFromTimeContent(timeContent) << std::endl;
 
   return 0;
 }

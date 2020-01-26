@@ -3,4 +3,4 @@
 mkdir -p Build
 cmake -BBuild -H.
 cd Build
-make
+make -j 12
