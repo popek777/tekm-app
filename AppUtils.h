@@ -8,10 +8,6 @@ struct BriefItem {
   std::string desc;
 };
 
-std::vector<BriefItem> cutBriefItems(const std::string& htmlContent);
-
-void removeUnrecognizedXmlPatterns(std::string& htmlContent);
-
-std::string getBriefsFromTimeContent(const std::string& timeContent);
+std::vector<BriefItem> cutBriefItems(const std::string& timeHtmlContent);
 
 std::string serializeToJsonString(const std::vector<BriefItem>&);

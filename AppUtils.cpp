@@ -1,48 +1,19 @@
 #include "AppUtils.h"
 
-#include <iostream>
-#include <istream>
-#include <ostream>
-
 #include <boost/algorithm/string.hpp>
-#include <boost/property_tree/json_parser.hpp>
-#include <boost/property_tree/xml_parser.hpp>
 
 #include <fifo_map.hpp>
 #include <nlohmann/json.hpp>
 
-namespace pt = boost::property_tree;
-
-void removeUnrecognizedXmlPatterns(std::string& htmlContent) {
-  std::size_t pos{0};
-  while (std::string::npos != (pos = htmlContent.find("<script async", pos))) {
-    constexpr std::size_t closingCharOffset = 13;
-    if (htmlContent[pos + closingCharOffset ] == '>') {
-      constexpr std::size_t spaceOffset = 7;
-      // replace '<script async>' with '<script>      '
-      htmlContent.replace(pos + spaceOffset, 6, ">      ");
-    } else {
-      constexpr std::size_t asyncWordOffset = 8;
-      constexpr std::size_t asyncWordLen{5};
-      // replace '<script async name="val"...' with <script       name="val"...
-      htmlContent.replace(pos + asyncWordOffset, asyncWordLen, asyncWordLen,
-                          ' ');
-    }
-  }
-
-  pos = 0;
-  while (std::string::npos != (pos = htmlContent.find("async src=", pos))) {
-    constexpr std::size_t asyncWordLen{5};
-    // replace 'async src=...' with '      src=...'
-    htmlContent.replace(pos, asyncWordLen, asyncWordLen, ' ');
-  }
-}
-
-std::vector<BriefItem> cutBriefItems(const std::string& timeContent) {
+// NOTE:
+// this is very poor solution (parsing content string 'by hand') however boost
+// property tree , nor tooska libraries did not cope with parsing time.com html content
+// so I decided to manually parse 'brief items' from html content
+std::vector<BriefItem> cutBriefItems(const std::string& timeHtmlContent) {
   std::size_t pos{0};
 
   auto findNext = [&](const char* tag) {
-    pos = timeContent.find(tag, pos);
+    pos = timeHtmlContent.find(tag, pos);
     if (std::string::npos == pos)
       throw std::runtime_error("tag '" + std::string(tag) + "' was not found");
   };
@@ -60,13 +31,13 @@ std::vector<BriefItem> cutBriefItems(const std::string& timeContent) {
     pos += refOffset;
     auto refStartPos = pos;
     findNext("\">");
-    item.ref = timeContent.substr(refStartPos, pos - refStartPos);
+    item.ref = timeHtmlContent.substr(refStartPos, pos - refStartPos);
 
     constexpr std::size_t descOffset = 2;
     pos += descOffset;
     auto descStartPos = pos;
     findNext("</a>");
-    item.desc = timeContent.substr(descStartPos, pos - descStartPos);
+    item.desc = timeHtmlContent.substr(descStartPos, pos - descStartPos);
     boost::trim(item.desc);
   }
 
@@ -102,14 +73,3 @@ std::string serializeToJsonString(const std::vector<BriefItem>& briefItems) {
   return root.dump(2);
 }
 
-std::string getBriefsFromTimeContent(const std::string& timeContent) {
-  std::istringstream is{timeContent};
-
-  pt::ptree tree;
-  pt::xml_parser::read_xml(is, tree);
-
-  std::ostringstream os;
-  pt::json_parser::write_json(os, tree);
-
-  return os.str();
-}
